@@ -1,22 +1,22 @@
-"use client";
+'use client'
 
-import logo from "@/assets/logo-light.svg";
-import { Confetti } from "@/components/confetti";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import type { CheckoutSession } from "@/http/schemas";
-import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { Confetti } from '@/components/confetti'
+import { Logo } from '@/components/logo'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import type { CheckoutSession } from '@/http/schemas'
+import { motion } from 'framer-motion'
+import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 interface AnimatedSuccessItemsProps {
-  session: CheckoutSession | undefined;
+  session: CheckoutSession | undefined
 }
 
 export function AnimatedSuccessItems({ session }: AnimatedSuccessItemsProps) {
   if (!session) {
-    throw new Error("Checkout session not found");
+    throw new Error('Checkout session not found')
   }
 
   return (
@@ -36,13 +36,7 @@ export function AnimatedSuccessItems({ session }: AnimatedSuccessItemsProps) {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Image
-                src={logo}
-                alt="ACME Logo"
-                width={180}
-                height={100}
-                className="mb-8 mx-auto sm:mx-0 dark:invert"
-              />
+              <Logo className="mb-8 mx-auto sm:mx-0" />
             </motion.div>
             <motion.div
               className="flex justify-center"
@@ -62,7 +56,7 @@ export function AnimatedSuccessItems({ session }: AnimatedSuccessItemsProps) {
             <div className="space-y-4">
               <h1 className="text-3xl font-bold text-primary">
                 <span>
-                  Bem-vindo ao{" "}
+                  Bem-vindo ao{' '}
                   <span className="capitalize">{session.name}</span>!
                 </span>
               </h1>
@@ -82,7 +76,7 @@ export function AnimatedSuccessItems({ session }: AnimatedSuccessItemsProps) {
                 <span>Benefícios Desbloqueados:</span>
               </h2>
               <ul className="text-left space-y-2">
-                {session.benefits.split("|").map((benefit, index) => (
+                {session.benefits.split('|').map((benefit, index) => (
                   <motion.li
                     key={benefit}
                     className="flex items-start"
@@ -115,5 +109,5 @@ export function AnimatedSuccessItems({ session }: AnimatedSuccessItemsProps) {
         </Card>
       </motion.div>
     </div>
-  );
+  )
 }

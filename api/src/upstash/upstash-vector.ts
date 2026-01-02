@@ -1,16 +1,32 @@
-import { Index } from "@upstash/vector";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash";
+import { UpstashVectorStore } from '@langchain/community/vectorstores/upstash'
+import { OpenAIEmbeddings } from '@langchain/openai'
+import { Index } from '@upstash/vector'
 
-const embeddings = new OpenAIEmbeddings({
-  openAIApiKey: process.env.OPENAI_API_KEY,
-});
+let upstashVectorInstance: UpstashVectorStore | null = null
 
-const indexWithCredentials = new Index({
-  url: process.env.UPSTASH_VECTOR_REST_URL as string,
-  token: process.env.UPSTASH_VECTOR_REST_TOKEN as string,
-});
+export function getUpstashVector(): UpstashVectorStore {
+  if (upstashVectorInstance) {
+    return upstashVectorInstance
+  }
 
-export const UpstashVector = new UpstashVectorStore(embeddings, {
-  index: indexWithCredentials,
-});
+  const url = process.env.UPSTASH_VECTOR_REST_URL
+  const token = process.env.UPSTASH_VECTOR_REST_TOKEN
+
+  if (!url || !token) {
+    throw new Error(
+      'UPSTASH_VECTOR_REST_URL and UPSTASH_VECTOR_REST_TOKEN must be set'
+    )
+  }
+
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY,
+  })
+
+  const indexWithCredentials = new Index({ url, token })
+
+  upstashVectorInstance = new UpstashVectorStore(embeddings, {
+    index: indexWithCredentials,
+  })
+
+  return upstashVectorInstance
+}

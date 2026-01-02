@@ -1,16 +1,15 @@
-import logoLight from "@/assets/logo-light.svg";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/toaster";
-import Image from "next/image";
-import Link from "next/link";
-import { ChatSidebar } from "../chat/components/chat-sidebar";
-import { ChatSidebarToggleButton } from "../chat/components/chat-sidebar-toggle-button";
-import { SettingsNavigation } from "./components/settings-navigation";
+import { Logo } from '@/components/logo'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { Toaster } from '@/components/ui/toaster'
+import Link from 'next/link'
+import { ChatSidebar } from '../chat/components/chat-sidebar'
+import { ChatSidebarToggleButton } from '../chat/components/chat-sidebar-toggle-button'
+import { SettingsNavigation } from './components/settings-navigation'
 
 export default function SettingsLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <>
@@ -21,11 +20,7 @@ export default function SettingsLayout({
             <ChatSidebarToggleButton isOutside={true} />
 
             <Link href="/" className="ml-auto">
-              <Image
-                src={logoLight}
-                alt="ACME"
-                className="min-w-28 w-28 dark:invert"
-              />
+              <Logo />
             </Link>
           </header>
           <div className="p-4">
@@ -39,5 +34,5 @@ export default function SettingsLayout({
       </SidebarProvider>
       <Toaster />
     </>
-  );
+  )
 }

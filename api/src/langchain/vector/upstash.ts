@@ -1,25 +1,30 @@
-import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { Index } from "@upstash/vector";
+import { UpstashVectorStore } from '@langchain/community/vectorstores/upstash'
+import { OpenAIEmbeddings } from '@langchain/openai'
+import { Index } from '@upstash/vector'
 
-const index = new Index({
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+let vectorStoreInstance: UpstashVectorStore | null = null
 
-const embeddings = new OpenAIEmbeddings({
+export async function getVectorStore(): Promise<UpstashVectorStore> {
+  if (vectorStoreInstance) {
+    return vectorStoreInstance
+  }
+
+  const url = process.env.UPSTASH_VECTOR_REST_URL
+  const token = process.env.UPSTASH_VECTOR_REST_TOKEN
+
+  if (!url || !token) {
+    throw new Error(
+      'UPSTASH_VECTOR_REST_URL and UPSTASH_VECTOR_REST_TOKEN must be set'
+    )
+  }
+
+  const index = new Index({ url, token })
+
+  const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY,
-});
+  })
 
-export async function createVectorStore() {
-    return new UpstashVectorStore(
-        embeddings,
-        {
-            index,
-        }
-    );
+  vectorStoreInstance = new UpstashVectorStore(embeddings, { index })
+
+  return vectorStoreInstance
 }
-
-export const vectorStore = await createVectorStore(); 

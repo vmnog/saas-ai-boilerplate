@@ -1,38 +1,37 @@
-import logo from "@/assets/logo-dark.svg";
-import preview from "@/assets/preview.png";
-import { ArrowRight, BookOpen, Bot, Brain } from "lucide-react";
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+import preview from '@/assets/preview.png'
+import { Logo } from '@/components/logo'
+import { ArrowRight, BookOpen, Bot, Brain } from 'lucide-react'
+import type { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: "ACME | AI-Powered Chat Assistant",
+  title: 'ACME | AI-Powered Chat Assistant',
   description:
-    "The ideal platform for professionals, offering AI-powered support for quick consultations and continuous learning.",
-  keywords:
-    "ai assistant, chatbot, virtual assistant, ai chat, saas",
+    'The ideal platform for professionals, offering AI-powered support for quick consultations and continuous learning.',
+  keywords: 'ai assistant, chatbot, virtual assistant, ai chat, saas',
   openGraph: {
-    title: "ACME | AI-Powered Chat Assistant",
+    title: 'ACME | AI-Powered Chat Assistant',
     description:
-      "The ideal platform for professionals, offering AI-powered support for quick consultations and continuous learning.",
-    type: "website",
-    locale: "pt-BR",
+      'The ideal platform for professionals, offering AI-powered support for quick consultations and continuous learning.',
+    type: 'website',
+    locale: 'pt-BR',
     images: [
       {
-        url: "assets/og-preview.png",
+        url: 'assets/og-preview.png',
         width: 1200,
         height: 630,
-        alt: "ACME Platform Preview",
+        alt: 'ACME Platform Preview',
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "ACME | AI-Powered Chat Assistant",
+    card: 'summary_large_image',
+    title: 'ACME | AI-Powered Chat Assistant',
     description:
-      "The ideal platform for professionals, offering AI-powered support for quick consultations and continuous learning.",
+      'The ideal platform for professionals, offering AI-powered support for quick consultations and continuous learning.',
   },
-};
+}
 
 export default function Page() {
   return (
@@ -41,13 +40,7 @@ export default function Page() {
         <div className="relative grid gap-12 sm:grid-cols-[400px_1fr] xl:grid-cols-2">
           <div className="flex flex-col justify-center space-y-8">
             <div className="space-y-2">
-              <Image
-                src={logo}
-                alt="ACME Logo"
-                width={180}
-                height={100}
-                className="mb-8 mx-auto sm:mx-0 invert dark:invert-0"
-              />
+              <Logo className="mb-8 mx-auto sm:mx-0" />
               <h1 className="text-4xl font-bold md:leading-tight tracking-tighter md:text-5xl lg:text-6xl">
                 Seu assistente médico
                 <span className="text-blue-500"> potencializado por IA</span>
@@ -91,8 +84,8 @@ export default function Page() {
             </div>
             <div className="space-y-8 border-t border-gray-700/70 pt-8">
               <p className="text-lg text-balance">
-                Quer melhorar sua{" "}
-                <span className="text-blue-500">prática clínica</span> <br />{" "}
+                Quer melhorar sua{' '}
+                <span className="text-blue-500">prática clínica</span> <br />{' '}
                 com <span className="text-blue-500">suporte inteligente</span>?
               </p>
               <Link
@@ -119,11 +112,8 @@ export default function Page() {
         </div>
       </main>
       <footer className="mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-        <p>
-          ACME Inc. All rights reserved.
-          &copy; {new Date().getFullYear()}
-        </p>
+        <p>ACME Inc. All rights reserved. &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
-  );
+  )
 }
