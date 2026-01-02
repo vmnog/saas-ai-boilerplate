@@ -1,0 +1,3 @@
+export enum API_ERROR_CODES {
+  DAILY_MESSAGE_LIMIT_REACHED = 429,
+}

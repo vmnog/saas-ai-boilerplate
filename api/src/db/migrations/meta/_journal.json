@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1736551169625,
+      "tag": "0000_whole_moondragon",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1736551169626,
+      "tag": "0001_create_free_product",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736799854627,
+      "tag": "0002_ambiguous_queen_noir",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1736992551835,
+      "tag": "0003_shallow_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1737076430109,
+      "tag": "0004_lyrical_grey_gargoyle",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1737415177256,
+      "tag": "0005_sticky_gwen_stacy",
+      "breakpoints": true
+    }
+  ]
+}

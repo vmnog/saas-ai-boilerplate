@@ -1,0 +1,15 @@
+{
+  "editor.formatOnSave": true,
+  "editor.fontFamily": "JetBrains Mono, monospace",
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "editor.codeActionsOnSave": {
+    "source.removeUnusedImports": "always",
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "always"
+  }
+}
