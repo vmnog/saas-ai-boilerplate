@@ -30,7 +30,23 @@ export default async function PlansPage() {
     },
   });
 
-  if (!products.length) return;
+  if (!products?.length) {
+    return (
+      <div className="flex min-h-dvh w-full flex-col items-center justify-center bg-background max-w-screen-xl mx-auto">
+        <header className="w-full flex justify-end p-8">
+          <NavigateBackButton />
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8">
+          <h1 className="text-2xl font-semibold text-foreground">
+            Nenhum plano disponível no momento
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Volte mais tarde para conferir nossos planos.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   async function handleCreateCheckoutSession(price: {
     id: string;

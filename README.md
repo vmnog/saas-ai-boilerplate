@@ -22,6 +22,7 @@ A production-ready SaaS AI chat boilerplate built with Next.js, Fastify, and Ope
 ## Tech Stack
 
 ### Frontend (UI)
+
 - **Framework**: Next.js 14 (App Router)
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui
@@ -29,6 +30,7 @@ A production-ready SaaS AI chat boilerplate built with Next.js, Fastify, and Ope
 - **Form Handling**: React Hook Form + Zod
 
 ### Backend (API)
+
 - **Framework**: Fastify
 - **Database**: PostgreSQL with Drizzle ORM
 - **AI**: OpenAI API, LangChain
@@ -41,19 +43,22 @@ A production-ready SaaS AI chat boilerplate built with Next.js, Fastify, and Ope
 
 - Node.js 20+
 - PostgreSQL
-- OpenAI API Key
+- OpenAI API Key + Assistant ID
+- Upstash Vector database (for RAG)
 - Stripe Account (for payments)
 - SMTP Server (for emails)
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/acme-saas-boilerplate.git
 cd acme-saas-boilerplate
 ```
 
 2. Install dependencies:
+
 ```bash
 # Install API dependencies
 cd api
@@ -67,6 +72,7 @@ npm install
 3. Set up environment variables:
 
 **API (.env)**:
+
 ```env
 PORT=8080
 NODE_ENV=development
@@ -85,6 +91,7 @@ MAIL_SMTP_PASS=your-smtp-password
 
 # OpenAI
 OPENAI_API_KEY=sk-...
+OPENAI_ASSISTANT_ID=asst_...
 
 # Auth
 USER_JWT_SECRET=your-jwt-secret
@@ -94,27 +101,41 @@ STRIPE_SECRET_KEY=sk_test_...
 STRIPE_SECRET_KEY_LIVE=sk_live_...
 STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Upstash Vector (RAG)
+UPSTASH_VECTOR_REST_URL=https://your-index.upstash.io
+UPSTASH_VECTOR_REST_TOKEN=your-token
 ```
 
 **UI (.env.local)**:
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
 NEXT_PUBLIC_CONTACT_EMAIL=contact@example.com
 ```
 
 4. Start the database:
+
 ```bash
 cd api
 docker-compose up -d
 ```
 
 5. Run migrations:
+
 ```bash
 cd api
 npm run db:migrate
 ```
 
-6. Start the development servers:
+This seeds the database with three default plans (Free, Basic, Premium). New users are automatically assigned the Free plan.
+
+6. Create an OpenAI Assistant:
+
+Go to [platform.openai.com/assistants](https://platform.openai.com/assistants), create an Assistant, and copy its ID into `OPENAI_ASSISTANT_ID` in your `.env` file.
+
+7. Start the development servers:
+
 ```bash
 # Terminal 1 - API
 cd api
@@ -125,10 +146,41 @@ cd ui
 npm run dev
 ```
 
-7. Open [http://localhost:3000](http://localhost:3000) in your browser.
+8. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 <!-- TODO: Add screenshot of the dashboard -->
 <!-- ![Dashboard](./screenshots/dashboard.png) -->
+
+## Testing
+
+<!-- TODO: Add screenshot of tests -->
+
+![Tests](./screenshots/tests.png)
+
+1. Make sure the Docker test database is running:
+
+```bash
+cd api
+docker-compose up -d
+```
+
+2. Run the test migrations:
+
+```bash
+npm run db:migrate:test
+```
+
+3. Run the tests:
+
+```bash
+npm run test
+```
+
+To run tests in watch mode:
+
+```bash
+npm run test:watch
+```
 
 ## Project Structure
 
@@ -165,11 +217,13 @@ npm run dev
 ### Legal Pages
 
 Update the placeholder content in:
+
 - `ui/app/(public)/politicas/termos-de-servico/page.tsx`
 - `ui/app/(public)/politicas/politica-de-privacidade/page.tsx`
 - `ui/app/(private)/components/terms-dialog.tsx`
 
 Replace:
+
 - `[YOUR ADDRESS]` with your company address
 - `XX.XXX.XXX/XXXX-XX` with your tax ID
 - `ACME Inc.` with your company name
@@ -177,6 +231,7 @@ Replace:
 ### AI Prompts
 
 Customize the AI behavior in:
+
 - `api/src/langchain/openai/create-langchain-openai-message.ts`
 
 <!-- TODO: Add screenshot of the settings page -->
@@ -187,6 +242,7 @@ Customize the AI behavior in:
 ### API
 
 The API can be deployed to any Node.js hosting platform:
+
 - Railway
 - Render
 - AWS EC2/ECS
@@ -195,6 +251,7 @@ The API can be deployed to any Node.js hosting platform:
 ### UI
 
 The Next.js frontend can be deployed to:
+
 - Vercel (recommended)
 - Netlify
 - AWS Amplify

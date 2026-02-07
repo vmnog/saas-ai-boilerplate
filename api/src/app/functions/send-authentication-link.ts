@@ -44,8 +44,6 @@ export async function sendAuthenticationLink(
   const authUrl = new URL("/auth/authenticate", env.WEB_URL);
   authUrl.searchParams.set("code", code);
 
-  console.log(`✉️ Authenticate using: ${authUrl.toString()}`);
-
   try {
     await sendAuthMagicLink({
       code,

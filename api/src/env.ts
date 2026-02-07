@@ -16,6 +16,7 @@ const envSchema = z.object({
   MAIL_SMTP_PASS: z.string().min(1),
 
   OPENAI_API_KEY: z.string().min(1),
+  OPENAI_ASSISTANT_ID: z.string().min(1),
 
   USER_JWT_SECRET: z.string().min(1),
 
@@ -23,6 +24,9 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY_LIVE: z.string().min(1),
   STRIPE_PUBLISHABLE_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
+
+  UPSTASH_VECTOR_REST_TOKEN: z.string().min(1),
+  UPSTASH_VECTOR_REST_URL: z.string().url().min(1),
 })
 
 export const env = envSchema.parse(process.env)

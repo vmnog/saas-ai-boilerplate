@@ -1,7 +1,7 @@
 import { type Either, makeRight } from '@/core/either'
 import { db } from '@/db'
 import { schema } from '@/db/schema'
-import { and, asc, eq, gt, isNotNull } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import type { ResourceNotFound } from '../errors/resource-not-found'
 
@@ -67,12 +67,7 @@ export async function listProducts(
     })
     .from(schema.products)
     .where(
-      and(
-        gt(schema.prices.unitAmount, 0),
-        eq(schema.products.active, true),
-        eq(schema.prices.active, true),
-        isNotNull(schema.prices.trialPeriodDays)
-      )
+      and(eq(schema.products.active, true), eq(schema.prices.active, true))
     )
     .innerJoin(
       schema.prices,
@@ -89,11 +84,11 @@ export async function listProducts(
     active: product.active,
     metadata: product.metadata
       ? {
-        sendMessageLimit: Number(product.metadata.sendMessageLimit),
-        benefits: product.metadata.benefits || '',
-        shouldHighlight: product.metadata.shouldHighlight || false,
-        off: Number(product.metadata.off),
-      }
+          sendMessageLimit: Number(product.metadata.sendMessageLimit),
+          benefits: product.metadata.benefits || '',
+          shouldHighlight: product.metadata.shouldHighlight || false,
+          off: Number(product.metadata.off) || 0,
+        }
       : null,
     price: product.price,
     createdAt: product.createdAt,

@@ -43,6 +43,13 @@
       "when": 1737415177256,
       "tag": "0005_sticky_gwen_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1738874400000,
+      "tag": "0006_seed_plans",
+      "breakpoints": true
     }
   ]
 }

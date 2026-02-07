@@ -356,10 +356,11 @@ export function SendMessage({
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
     let fullContent = "";
+    let completed = false;
 
-    const processBuffer = async (buffer: string) => {
+    const processBuffer = async (chunk: string) => {
       try {
-        const parsed = JSON.parse(buffer);
+        const parsed = JSON.parse(chunk);
 
         switch (parsed.event) {
           case "thread.message.delta": {
@@ -371,13 +372,31 @@ export function SendMessage({
             break;
           }
           case "thread.run.completed": {
+            completed = true;
             wasMessageSentRef.current = false;
             await onThreadCompleted();
             break;
           }
+          case "thread.run.failed": {
+            completed = true;
+            throw new Error(
+              parsed.data?.last_error?.message ||
+                "Erro ao processar resposta da IA",
+            );
+          }
+          case "stream.error": {
+            completed = true;
+            throw new Error(
+              parsed.data?.message || "Erro ao processar resposta da IA",
+            );
+          }
         }
       } catch (error) {
-        console.error("Error parsing buffer:", error);
+        if (error instanceof SyntaxError) {
+          console.error("Error parsing buffer:", error);
+          return;
+        }
+        throw error;
       }
     };
 
@@ -389,11 +408,14 @@ export function SendMessage({
 
       while (true) {
         const offset = buffer.indexOf("\n");
-        if (offset >= 0) {
-          processBuffer(buffer.substring(0, offset));
-          buffer = buffer.slice(offset + 1);
-        } else break;
+        if (offset < 0) break;
+        await processBuffer(buffer.substring(0, offset));
+        buffer = buffer.slice(offset + 1);
       }
+    }
+
+    if (!completed) {
+      throw new Error("A resposta da IA foi interrompida inesperadamente");
     }
   };
 

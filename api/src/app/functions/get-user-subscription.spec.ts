@@ -1,48 +1,50 @@
-import { isRight, unwrapEither } from "@/core/either";
-import { makeLimit } from "@/test/factories/make-limit";
-import { makeNewSubscription } from "@/test/factories/make-new-subscription";
-import { makePrice } from "@/test/factories/make-price";
-import { makeProduct } from "@/test/factories/make-product";
-import { makeUser } from "@/test/factories/make-user";
-import { describe, expect, it } from "vitest";
-import { ResourceNotFound } from "../errors/resource-not-found";
-import { getUserSubscription } from "./get-user-subscription";
+import { isRight, unwrapEither } from '@/core/either'
+import { makeLimit } from '@/test/factories/make-limit'
+import { makeNewSubscription } from '@/test/factories/make-new-subscription'
+import { makePrice } from '@/test/factories/make-price'
+import { makeProduct } from '@/test/factories/make-product'
+import { makeUser } from '@/test/factories/make-user'
+import { describe, expect, it } from 'vitest'
+import { ResourceNotFound } from '../errors/resource-not-found'
+import { getUserSubscription } from './get-user-subscription'
 
-describe("get user subscription", () => {
-  it("should be able to get the user subscription", async () => {
-    const user = await makeUser();
+describe('get user subscription', () => {
+  it('should be able to get the user subscription', async () => {
+    const user = await makeUser()
     const product = await makeProduct({
       metadata: {
         sendMessageLimit: 100,
-        benefits: "Some benefits"
-      }
-    });
+        benefits: 'Some benefits',
+        shouldHighlight: false,
+        off: 0,
+      },
+    })
     const price = await makePrice({
       stripeProductId: product.stripeProductId,
       unitAmount: 1000,
-    });
+    })
     const subscription = await makeNewSubscription({
       userId: user.id,
       priceId: price.id,
-      status: "active",
+      status: 'active',
       currentPeriodStart: new Date(),
       currentPeriodEnd: new Date(),
       cancelAtPeriodEnd: false,
       cancelAt: null,
       canceledAt: null,
-    });
+    })
     await makeLimit({
       userId: user.id,
       sendMessageLimit: product.metadata?.sendMessageLimit,
       sendMessageUsed: 0,
       sendMessageLimitResetAt: null,
-    });
+    })
 
     const sut = await getUserSubscription({
       userId: user.id,
-    });
+    })
 
-    expect(isRight(sut)).toBe(true);
+    expect(isRight(sut)).toBe(true)
     expect(unwrapEither(sut)).toEqual(
       expect.objectContaining({
         id: subscription.id,
@@ -50,23 +52,46 @@ describe("get user subscription", () => {
           id: product.id,
           name: product.name,
           monthlyPrice: price.unitAmount,
-          metadata: {
+          metadata: expect.objectContaining({
             sendMessageLimit: product.metadata?.sendMessageLimit,
             benefits: product.metadata?.benefits,
-          },
+          }),
         }),
         startsAt: subscription.currentPeriodStart,
         endsAt: subscription.currentPeriodEnd,
-      }),
-    );
-  });
+      })
+    )
+  })
 
-  it("should not be able to get subscription from non existing user", async () => {
+  it('should create a free subscription fallback when user has no subscription', async () => {
+    const user = await makeUser()
+
     const sut = await getUserSubscription({
-      userId: "non-existing-user",
-    });
+      userId: user.id,
+    })
 
-    expect(isRight(sut)).toBe(false);
-    expect(unwrapEither(sut)).toBeInstanceOf(ResourceNotFound);
-  });
-});
+    expect(isRight(sut)).toBe(true)
+
+    const result = unwrapEither(sut)
+    expect(result).toEqual(
+      expect.objectContaining({
+        status: 'active',
+        product: expect.objectContaining({
+          monthlyPrice: 0,
+          metadata: expect.objectContaining({
+            sendMessageLimit: expect.any(Number),
+          }),
+        }),
+      })
+    )
+  })
+
+  it('should not be able to get subscription from non existing user', async () => {
+    const sut = await getUserSubscription({
+      userId: 'non-existing-user',
+    })
+
+    expect(isRight(sut)).toBe(false)
+    expect(unwrapEither(sut)).toBeInstanceOf(ResourceNotFound)
+  })
+})

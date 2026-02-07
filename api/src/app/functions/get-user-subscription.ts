@@ -1,13 +1,13 @@
-import { type Either, makeLeft, makeRight } from "@/core/either";
-import { db } from "@/db";
-import { schema } from "@/db/schema";
-import { and, desc, eq, getTableColumns } from "drizzle-orm";
-import { z } from "zod";
-import { ResourceNotFound } from "../errors/resource-not-found";
+import { type Either, makeLeft, makeRight } from '@/core/either'
+import { db } from '@/db'
+import { schema } from '@/db/schema'
+import { and, desc, eq } from 'drizzle-orm'
+import { z } from 'zod'
+import { ResourceNotFound } from '../errors/resource-not-found'
 
 const getUserSubscriptionInput = z.object({
   userId: z.string(),
-});
+})
 
 const getUserSubscriptionOutput = z.object({
   id: z.string(),
@@ -30,23 +30,23 @@ const getUserSubscriptionOutput = z.object({
       })
       .nullable(),
   }),
-});
+})
 
-type GetUserSubscriptionInput = z.infer<typeof getUserSubscriptionInput>;
-type GetUserSubscriptionOutput = z.infer<typeof getUserSubscriptionOutput>;
+type GetUserSubscriptionInput = z.infer<typeof getUserSubscriptionInput>
+type GetUserSubscriptionOutput = z.infer<typeof getUserSubscriptionOutput>
 
 export async function getUserSubscription(
-  input: GetUserSubscriptionInput,
+  input: GetUserSubscriptionInput
 ): Promise<Either<ResourceNotFound, GetUserSubscriptionOutput>> {
-  const { userId } = getUserSubscriptionInput.parse(input);
+  const { userId } = getUserSubscriptionInput.parse(input)
 
   const users = await db
     .select()
     .from(schema.users)
-    .where(eq(schema.users.id, userId));
+    .where(eq(schema.users.id, userId))
 
   if (users.length === 0) {
-    return makeLeft(new ResourceNotFound("Usuário não encontrado."));
+    return makeLeft(new ResourceNotFound('Usuário não encontrado.'))
   }
 
   const subscriptions = await db
@@ -71,28 +71,93 @@ export async function getUserSubscription(
     .where(
       and(
         eq(schema.newSubscriptions.userId, userId),
-        eq(schema.newSubscriptions.status, "active"),
-      ),
+        eq(schema.newSubscriptions.status, 'active')
+      )
     )
     .innerJoin(
       schema.prices,
-      eq(schema.newSubscriptions.priceId, schema.prices.id),
+      eq(schema.newSubscriptions.priceId, schema.prices.id)
     )
     .innerJoin(
       schema.products,
-      eq(schema.prices.stripeProductId, schema.products.stripeProductId),
+      eq(schema.prices.stripeProductId, schema.products.stripeProductId)
     )
     .innerJoin(
       schema.users,
-      eq(schema.newSubscriptions.userId, schema.users.id),
+      eq(schema.newSubscriptions.userId, schema.users.id)
     )
-    .orderBy(desc(schema.newSubscriptions.createdAt));
+    .orderBy(desc(schema.newSubscriptions.createdAt))
 
   if (subscriptions.length === 0) {
-    return makeLeft(new ResourceNotFound("Assinatura não encontrada."));
+    const [freeProduct] = await db
+      .select({
+        priceId: schema.prices.id,
+        productId: schema.products.id,
+        productName: schema.products.name,
+        unitAmount: schema.prices.unitAmount,
+        metadata: schema.products.metadata,
+      })
+      .from(schema.products)
+      .where(eq(schema.prices.unitAmount, 0))
+      .innerJoin(
+        schema.prices,
+        eq(schema.products.stripeProductId, schema.prices.stripeProductId)
+      )
+
+    if (!freeProduct) {
+      return makeLeft(new ResourceNotFound('Assinatura não encontrada.'))
+    }
+
+    if (!freeProduct.metadata?.sendMessageLimit) {
+      return makeLeft(
+        new ResourceNotFound('Free Product Metadata sendMessageLimit not found')
+      )
+    }
+
+    const [createdSubscription] = await db
+      .insert(schema.newSubscriptions)
+      .values({
+        userId,
+        priceId: freeProduct.priceId,
+        status: 'active',
+        quantity: 1,
+      })
+      .returning()
+
+    const existingLimits = await db
+      .select()
+      .from(schema.limits)
+      .where(eq(schema.limits.userId, userId))
+
+    if (existingLimits.length === 0) {
+      await db.insert(schema.limits).values({
+        userId,
+        sendMessageLimit: freeProduct.metadata.sendMessageLimit,
+        sendMessageUsed: 0,
+        sendMessageLimitResetAt: null,
+      })
+    }
+
+    return makeRight({
+      id: createdSubscription.id,
+      startsAt: createdSubscription.currentPeriodStart,
+      endsAt: createdSubscription.currentPeriodEnd,
+      status: createdSubscription.status,
+      cancelAtPeriodEnd: createdSubscription.cancelAtPeriodEnd,
+      cancelAt: createdSubscription.cancelAt,
+      canceledAt: createdSubscription.canceledAt,
+      currentPeriodStart: createdSubscription.currentPeriodStart,
+      currentPeriodEnd: createdSubscription.currentPeriodEnd,
+      product: {
+        id: freeProduct.productId,
+        name: freeProduct.productName,
+        monthlyPrice: freeProduct.unitAmount,
+        metadata: freeProduct.metadata,
+      },
+    })
   }
 
-  const subscription = subscriptions[0];
+  const subscription = subscriptions[0]
 
   if (subscription.product.monthlyPrice === 0) {
     const [latestFreeProduct] = await db
@@ -101,29 +166,29 @@ export async function getUserSubscription(
       .where(eq(schema.prices.unitAmount, 0))
       .innerJoin(
         schema.products,
-        eq(schema.prices.stripeProductId, schema.products.stripeProductId),
+        eq(schema.prices.stripeProductId, schema.products.stripeProductId)
       )
-      .orderBy(desc(schema.products.updatedAt));
+      .orderBy(desc(schema.products.updatedAt))
 
     await db
       .update(schema.newSubscriptions)
       .set({
         priceId: latestFreeProduct.priceId,
       })
-      .where(eq(schema.newSubscriptions.id, subscription.id));
+      .where(eq(schema.newSubscriptions.id, subscription.id))
   }
 
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV !== 'production') {
     const limits = await db
       .select()
       .from(schema.limits)
-      .where(eq(schema.limits.userId, userId));
+      .where(eq(schema.limits.userId, userId))
 
     if (limits.length === 0) {
-      return makeLeft(new ResourceNotFound("Limites não encontrados."));
+      return makeLeft(new ResourceNotFound('Limites não encontrados.'))
     }
 
-    const limit = limits[0];
+    const limit = limits[0]
 
     if (
       limit.sendMessageLimit !== subscription.product.metadata?.sendMessageLimit
@@ -135,8 +200,8 @@ export async function getUserSubscription(
           sendMessageUsed: 0,
           sendMessageLimitResetAt: null,
         })
-        .where(eq(schema.limits.userId, userId));
+        .where(eq(schema.limits.userId, userId))
     }
   }
-  return makeRight(subscription);
+  return makeRight(subscription)
 }
