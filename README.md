@@ -2,8 +2,7 @@
 
 A production-ready SaaS AI chat boilerplate built with Next.js, Fastify, and OpenAI. Perfect for building AI-powered chat applications with subscription management, user authentication, and more.
 
-<!-- TODO: Add screenshot of the landing page -->
-<!-- ![Landing Page](./screenshots/landing.png) -->
+![Landing Page](./screenshots/landing.png)
 
 ## Features
 
@@ -16,8 +15,7 @@ A production-ready SaaS AI chat boilerplate built with Next.js, Fastify, and Ope
 - **File Uploads** - Support for document analysis and attachments
 - **Export** - Export conversations to CSV, Excel, or PDF
 
-<!-- TODO: Add screenshot of the chat interface -->
-<!-- ![Chat Interface](./screenshots/chat.png) -->
+![Chat Interface](./screenshots/chat.png)
 
 ## Tech Stack
 
@@ -148,12 +146,9 @@ npm run dev
 
 8. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-<!-- TODO: Add screenshot of the dashboard -->
-<!-- ![Dashboard](./screenshots/dashboard.png) -->
+![Dashboard](./screenshots/dashboard.png)
 
 ## Testing
-
-<!-- TODO: Add screenshot of tests -->
 
 ![Tests](./screenshots/tests.png)
 
@@ -234,8 +229,7 @@ Customize the AI behavior in:
 
 - `api/src/langchain/openai/create-langchain-openai-message.ts`
 
-<!-- TODO: Add screenshot of the settings page -->
-<!-- ![Settings](./screenshots/settings.png) -->
+![Settings](./screenshots/settings.png)
 
 ## Deployment
 
